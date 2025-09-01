@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum PromoTokenStatus {
+  ISSUED
+  REDEEMED
+  REVOKED
+  EXPIRED
+}
+
+enum RedemptionResult {
+  APPROVED
+  DUPLICATE
+  EXPIRED
+  INACTIVE
+  OUT_OF_CAP
+  REVOKED
+}
+
+model User {
+  id                   String            @id @default(cuid())
+  supabaseUid          String            @unique // Campo para mapear con Supabase
+  email                String            @unique
+  name                 String?
+  role                 Role              @default(USER)
+  schoolId             String?
+  onboardingCompleted  Boolean           @default(false) // Nuevo campo para onboarding
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  redemptions          Redemption[]
+  pointsLedger         PointsLedger[]
+  adminMemberships     AdminMembership[]
+  promoTokens          PromoToken[]
+  school               School?           @relation(fields: [schoolId], references: [id])
+}
+
+model School {
+  id         String            @id @default(cuid())
+  name       String            @unique
+  promotions Promotion[]
+  users      User[]
+  admins     AdminMembership[]
+}
+
+model AdminMembership {
+  id        String   @id @default(cuid())
+  userId    String
+  schoolId  String
+  user      User     @relation(fields: [userId], references: [id])
+  school    School   @relation(fields: [schoolId], references: [id])
+  role      String
+  createdAt DateTime @default(now())
+}
+
+model Promotion {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  points      Int
+  schoolId    String?
+  school      School?      @relation(fields: [schoolId], references: [id])
+  startsAt    DateTime?
+  endsAt      DateTime?
+  perUserCap  Int?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  redemptions Redemption[]
+  promoTokens PromoToken[]
+}
+
+model Redemption {
+  id        String            @id @default(cuid())
+  userId    String
+  promoId   String
+  adminId   String
+  jti       String            @unique
+  result    RedemptionResult  @default(APPROVED)
+  reason    String?
+  createdAt DateTime          @default(now())
+  user      User              @relation(fields: [userId], references: [id])
+  promotion Promotion         @relation(fields: [promoId], references: [id])
+}
+
+model PromoToken {
+  jti        String            @id @default(cuid())
+  userId     String
+  promoId    String
+  deviceId   String
+  issuedAt   DateTime          @default(now())
+  expiresAt  DateTime
+  status     PromoTokenStatus  @default(ISSUED)
+  redeemedAt DateTime?
+
+  user       User              @relation(fields: [userId], references: [id])
+  promotion  Promotion         @relation(fields: [promoId], references: [id])
+
+  @@index([promoId, userId])
+  @@index([status, expiresAt])
+}
+
+model PointsLedger {
+  id           String   @id @default(cuid())
+  userId       String
+  delta        Int
+  reason       String
+  promoId      String?
+  redemptionId String?
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id])
+}

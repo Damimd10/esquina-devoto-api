@@ -1,0 +1,23 @@
+# Node / RN
+node_modules/
+npm-debug.log*
+yarn-*.log
+dist/
+build/
+android/app/build/
+ios/build/
+*.log
+
+# Env
+.env*
+!.env.example
+
+# Terraform
+**/.terraform/**
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+!.terraform.lock.hcl
