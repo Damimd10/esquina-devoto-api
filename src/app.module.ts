@@ -1,5 +1,6 @@
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
+import { PrismaModule } from 'nestjs-prisma';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -8,11 +9,13 @@ import { SchoolsModule } from './schools/schools.module';
 import { PromotionsModule } from './promotions/promotions.module';
 import { QrModule } from './qr/qr.module';
 import { RedeemModule } from './redeem/redeem.module';
-import { PrismaService } from './prisma/prisma.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule.forRoot({
+      isGlobal: true,
+    }),
     UsersModule,
     AuthModule,
     SchoolsModule,
@@ -22,6 +25,6 @@ import { PrismaService } from './prisma/prisma.service';
   ],
   controllers: [AppController],
   providers: [AppService],
-  exports: [PrismaService],
+  exports: [],
 })
 export class AppModule {}

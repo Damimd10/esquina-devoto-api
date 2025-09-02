@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from 'nestjs-prisma';
 import type { School } from '@prisma/client';
 
 @Injectable()
@@ -24,7 +24,10 @@ export class SchoolsService {
     });
   }
 
-  async create(data: { name: string; location?: { lat: number; lon: number } }): Promise<School> {
+  async create(data: {
+    name: string;
+    location?: { lat: number; lon: number };
+  }): Promise<School> {
     return this.prisma.school.create({
       data: {
         name: data.name,
@@ -33,7 +36,10 @@ export class SchoolsService {
     });
   }
 
-  async update(id: string, data: { name?: string; location?: { lat: number; lon: number } }): Promise<School> {
+  async update(
+    id: string,
+    data: { name?: string; location?: { lat: number; lon: number } },
+  ): Promise<School> {
     return this.prisma.school.update({
       where: { id },
       data: {

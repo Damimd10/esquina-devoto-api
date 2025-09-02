@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from 'nestjs-prisma';
 import type { SupabaseUser } from '../auth/supabase-auth.guard';
 import type { User } from '@prisma/client';
 

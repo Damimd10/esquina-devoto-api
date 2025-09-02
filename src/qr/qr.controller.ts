@@ -26,7 +26,9 @@ export class QrController {
     @CurrentUser() supabaseUser: SupabaseUser,
   ) {
     if (!deviceId || deviceId.length > 128) {
-      throw new BadRequestException('x-device-id header is required and must be ≤128 characters');
+      throw new BadRequestException(
+        'x-device-id header is required and must be ≤128 characters',
+      );
     }
 
     return this.qrService.issueQrToken(promoId, supabaseUser.sub, deviceId);
@@ -40,9 +42,15 @@ export class QrController {
     @CurrentUser() supabaseUser: SupabaseUser,
   ) {
     if (!deviceId || deviceId.length > 128) {
-      throw new BadRequestException('x-device-id header is required and must be ≤128 characters');
+      throw new BadRequestException(
+        'x-device-id header is required and must be ≤128 characters',
+      );
     }
 
-    await this.qrService.revokeActiveTokens(promoId, supabaseUser.sub, deviceId);
+    await this.qrService.revokeActiveTokens(
+      promoId,
+      supabaseUser.sub,
+      deviceId,
+    );
   }
 }

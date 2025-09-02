@@ -1,5 +1,9 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
+import { PrismaService } from 'nestjs-prisma';
 import { UsersService } from '../users/users.service';
 import { supabase } from './supabase-client';
 
@@ -50,7 +54,9 @@ export class AuthService {
         },
       };
     } catch (error) {
-      throw new UnauthorizedException(`Error confirmando email: ${error.message}`);
+      throw new UnauthorizedException(
+        `Error confirmando email: ${error.message}`,
+      );
     }
   }
 

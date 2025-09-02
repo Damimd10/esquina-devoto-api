@@ -57,3 +57,31 @@ resource "aws_iam_role_policy_attachment" "ecs_exec_read_db_secret_attach" {
   role       = aws_iam_role.ecs_task_execution.name
   policy_arn = aws_iam_policy.ecs_exec_read_db_secret.arn
 }
+
+data "aws_iam_policy_document" "ecs_exec_read_supabase_secrets" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+    resources = [
+      aws_secretsmanager_secret.supabase_url.arn,
+      "${aws_secretsmanager_secret.supabase_url.arn}*",
+      aws_secretsmanager_secret.supabase_service_role.arn,
+      "${aws_secretsmanager_secret.supabase_service_role.arn}*",
+      aws_secretsmanager_secret.supabase_jwt_secret.arn,
+      "${aws_secretsmanager_secret.supabase_jwt_secret.arn}*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "ecs_exec_read_supabase_secrets" {
+  name   = "${local.name}-exec-read-supabase"
+  policy = data.aws_iam_policy_document.ecs_exec_read_supabase_secrets.json
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_exec_read_supabase_secrets_attach" {
+  role       = aws_iam_role.ecs_task_execution.name
+  policy_arn = aws_iam_policy.ecs_exec_read_supabase_secrets.arn
+}

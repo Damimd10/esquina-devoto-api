@@ -13,7 +13,9 @@ export class PublicUsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('role/:supabaseUid')
-  async getUserRole(@Param('supabaseUid') supabaseUid: string): Promise<UserRoleDto> {
+  async getUserRole(
+    @Param('supabaseUid') supabaseUid: string,
+  ): Promise<UserRoleDto> {
     try {
       const user = await this.usersService.findBySupabaseUid(supabaseUid);
       if (!user) {
@@ -33,7 +35,10 @@ export class PublicUsersController {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

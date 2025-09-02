@@ -149,8 +149,12 @@ resource "aws_ecs_task_definition" "app" {
         }
       }
       secrets = [
-        { name = "DATABASE_URL", valueFrom = aws_secretsmanager_secret.db_url.arn }
-      ]
+  { name = "DATABASE_URL",              valueFrom = aws_secretsmanager_secret.db_url.arn },
+  { name = "SUPABASE_URL",              valueFrom = aws_secretsmanager_secret.supabase_url.arn },
+  { name = "SUPABASE_SERVICE_ROLE_KEY", valueFrom = aws_secretsmanager_secret.supabase_service_role.arn },
+  # opcional si lo usa el backend:
+  { name = "SUPABASE_JWT_SECRET",       valueFrom = aws_secretsmanager_secret.supabase_jwt_secret.arn }
+]
       environment = [
         { name = "PORT", value = tostring(var.container_port) }
         # agrega aquí otras variables NO sensibles si hace falta

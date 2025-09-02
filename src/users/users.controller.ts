@@ -81,7 +81,9 @@ export class UsersController {
   }
 
   @Get('role/:supabaseUid')
-  async getUserRole(@Param('supabaseUid') supabaseUid: string): Promise<UserRoleDto> {
+  async getUserRole(
+    @Param('supabaseUid') supabaseUid: string,
+  ): Promise<UserRoleDto> {
     const user = await this.usersService.findBySupabaseUid(supabaseUid);
     if (!user) {
       throw new Error('User not found');
@@ -97,6 +99,4 @@ export class UsersController {
       school: user.school || undefined,
     };
   }
-
-
 }

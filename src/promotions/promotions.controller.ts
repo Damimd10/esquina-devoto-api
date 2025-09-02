@@ -26,7 +26,9 @@ export class PromotionsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createPromotion(@Body(ValidationPipe) createPromotionDto: CreatePromotionDto) {
+  async createPromotion(
+    @Body(ValidationPipe) createPromotionDto: CreatePromotionDto,
+  ) {
     return this.promotionsService.create(createPromotionDto);
   }
 
