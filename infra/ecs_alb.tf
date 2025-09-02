@@ -79,7 +79,7 @@ resource "aws_lb_target_group" "app" {
   target_type = "ip"
 
   health_check {
-    path                = "/health"
+    path                = "/v1/health"
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 5
@@ -137,7 +137,7 @@ resource "aws_ecs_task_definition" "app" {
   container_definitions = jsonencode([
     {
       name         = "app"
-      image        = "${aws_ecr_repository.app.repository_url}:latest"
+      image        = "${aws_ecr_repository.app.repository_url}:${var.image_tag}"
       essential    = true
       portMappings = [{ containerPort = var.container_port, hostPort = var.container_port }]
       logConfiguration = {
@@ -173,7 +173,7 @@ resource "aws_ecs_task_definition" "migrate" {
   container_definitions = jsonencode([
     {
       name      = "migrate"
-      image     = "${aws_ecr_repository.app.repository_url}:latest"
+      image     = "${aws_ecr_repository.app.repository_url}:${var.image_tag}"
       essential = true
       # Prisma:
       command = ["npx", "prisma", "migrate", "deploy"]

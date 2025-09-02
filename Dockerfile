@@ -1,32 +1,40 @@
-# ---- deps ----
-  FROM node:20-alpine AS deps
-  WORKDIR /app
-  # habilita pnpm vía Corepack y usa la versión definida en package.json
-  RUN corepack enable
-  COPY package.json pnpm-lock.yaml ./
-  # instala con el lockfile (equivalente a npm ci)
-  RUN pnpm install --frozen-lockfile
-  
-  # ---- build ----
-  FROM node:20-alpine AS build
-  WORKDIR /app
-  RUN corepack enable
-  COPY --from=deps /app/node_modules ./node_modules
-  # Si usas Prisma: copia el schema y genera (opcional)
-  # COPY prisma ./prisma
-  # RUN pnpm prisma generate
-  COPY . .
-  RUN pnpm build
-  
-  # ---- runtime ----
-  FROM node:20-alpine AS runner
-  WORKDIR /app
-  ENV NODE_ENV=production
-  RUN corepack enable
-  COPY package.json pnpm-lock.yaml ./
-  # instala solo deps de producción usando el lockfile
-  RUN pnpm install --prod --frozen-lockfile
-  COPY --from=build /app/dist ./dist
-  EXPOSE 3000
-  CMD ["node", "dist/main.js"]
-  
+# --- Base
+FROM node:20-alpine AS base
+WORKDIR /app
+ENV NODE_ENV=production
+RUN corepack enable
+
+# --- Deps (todas las deps para compilar)
+FROM base AS deps
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# --- Build (genera Prisma Client + compila Nest)
+FROM base AS build
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json pnpm-lock.yaml ./
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
+COPY src ./src
+COPY prisma ./prisma
+
+# Genera Prisma Client (necesario para que TS compile)
+RUN pnpm prisma generate
+
+# Compila Nest (usa tsconfig.build.json que excluye prisma/**/*.ts)
+RUN pnpm build
+
+# --- Runner (solo prod deps + opcional regenerate)
+FROM base AS runner
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --prod --frozen-lockfile
+
+# Artefactos de build y schema
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/prisma ./prisma
+
+# (Opcional pero recomendado) regenerar client en runtime por binarios
+RUN pnpm dlx prisma generate --schema=./prisma/schema.prisma
+
+EXPOSE 3000
+CMD ["node", "dist/main.js"]

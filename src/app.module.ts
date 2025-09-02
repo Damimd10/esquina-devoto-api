@@ -8,6 +8,7 @@ import { SchoolsModule } from './schools/schools.module';
 import { PromotionsModule } from './promotions/promotions.module';
 import { QrModule } from './qr/qr.module';
 import { RedeemModule } from './redeem/redeem.module';
+import { PrismaService } from './prisma/prisma.service';
 
 @Module({
   imports: [
@@ -21,5 +22,6 @@ import { RedeemModule } from './redeem/redeem.module';
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [PrismaService],
 })
 export class AppModule {}

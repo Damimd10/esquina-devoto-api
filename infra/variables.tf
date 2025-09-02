@@ -24,3 +24,9 @@ variable "db_allocated_storage_gb" { default = 20 }
 # (Opcional) dominio propio, para HTTPS con ACM/Route53 más tarde
 variable "domain_name" { default = "" }
 variable "hosted_zone_id" { default = "" }
+
+# Imagen de Docker
+variable "image_tag" {
+  type    = string
+  default = "latest" # lo sobreescribís en el apply
+}
