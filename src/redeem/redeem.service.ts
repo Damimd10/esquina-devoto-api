@@ -15,7 +15,7 @@ export class RedeemService {
     private configService: ConfigService,
   ) {}
 
-  async redeemToken(token: string, posId?: string): Promise<RedeemResponseDto> {
+  async redeemToken(token: string): Promise<RedeemResponseDto> {
     try {
       // Verificar firma y exp del JWT
       const secret = new TextEncoder().encode(
@@ -113,7 +113,7 @@ export class RedeemService {
           data: {
             userId: userId as string,
             promoId: promoId as string,
-            adminId: posId || 'system', // Usar posId si está disponible
+            adminId: 'system', // Sistema automático
             jti: jti as string,
             result: 'APPROVED',
           },
